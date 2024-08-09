@@ -127,6 +127,7 @@ jobs:
         continue-on-error: true
         run: archery docker push ${{ matrix.image }}
 
+
   macos:
     name: AMD64 macOS 12 Python 3
     runs-on: macos-latest
