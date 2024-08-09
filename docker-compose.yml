@@ -126,6 +126,7 @@ x-hierarchy:
         - conda-python-jpype
         - conda-python-spark
         - conda-python-substrait
+  - ppc64le-python
   - conda-verify-rc
   - conan
   - debian-cpp:
@@ -872,6 +873,35 @@ services:
         /arrow/ci/scripts/cpp_build.sh /arrow /build &&
         /arrow/ci/scripts/python_build.sh /arrow /build &&
         /arrow/ci/scripts/python_test.sh /arrow"]
+
+  ppc64le-python:
+    # Usage:
+    #   docker-compose build conda
+    #   docker-compose build conda-cpp
+    #   docker-compose build conda-python
+    #   docker-compose run --rm conda-python
+    # Parameters:
+    #   ARCH: amd64, arm32v7
+    #   PYTHON: 3.8, 3.9, 3.10, 3.11
+    image: ppc64le/python:3.11-slim-bullseye
+    build:
+      context: .
+      dockerfile: ci/docker/ppc64le-python-script.dockerfile
+      cache_from:
+        - ppc64le/python:3.11-slim-bullseye
+      args:
+        repo: ${REPO}
+        arch: ${ARCH}
+        python: ${PYTHON}
+    shm_size: *shm-size
+    environment:
+      <<: [*common, *ccache, *sccache]
+      PYTEST_ARGS:  # inherit
+    volumes: *ubuntu-volumes
+     
+    command: &ppc-python-command >
+        /bin/bash -c "
+          /arrow/ci/scripts/ppc_python_build.sh /arrow /build"
 
   ubuntu-cuda-python:
     # Usage:
