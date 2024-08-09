@@ -127,7 +127,7 @@ x-hierarchy:
         - conda-python-spark
         - conda-python-substrait
 
-  ppc64le-python
+  - ppc64le-python
   - conda-verify-rc
   - conan
   - debian-cpp:
