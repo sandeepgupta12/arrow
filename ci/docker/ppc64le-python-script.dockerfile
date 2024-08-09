@@ -34,7 +34,7 @@ RUN apt-get update -y -q && \
 
 RUN pip install Cython==3.0.8 numpy
 
-COPY python/requirements-test.txt /arrow/python/
+#COPY python/requirements-test.txt /arrow/python/
 # RUN pip install -r /arrow/python/requirements-test.txt
 RUN pip install pytest hypothesis pytest cffi pytz
 RUN pip install ninja
