@@ -901,7 +901,7 @@ services:
      
     command: &ppc-python-command >
         /bin/bash -c "
-          /arrow/ci/scripts/ppc_python_build.sh /arrow /build"
+          /arrow/ci/scripts/ppc_python_build-env.sh /arrow /build"
 
   ubuntu-cuda-python:
     # Usage:
