@@ -92,6 +92,15 @@ jobs:
             "runs-on": "ubuntu-latest",
             "title": "AMD64 Ubuntu 22.04 C++ ASAN UBSAN",
             "ubuntu": "22.04"
+          },
+          {
+            "arch": "ppc64le",
+            "clang-tools": "13",
+            "image": "ppc64le-cpp",
+            "llvm": "13",
+            "runs-on": ["self-hosted", "ppc64le", "linux"],
+            "title": "PPC64LE C++",
+            "ubuntu": "22.04"
           }
           JSON
           if [ "$GITHUB_REPOSITORY_OWNER" = "apache" ]; then
