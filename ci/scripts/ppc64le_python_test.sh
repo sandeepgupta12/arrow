@@ -41,7 +41,7 @@ if [ -z "${ARROW_DEBUG_MEMORY_POOL}" ]; then
   export ARROW_DEBUG_MEMORY_POOL=trap
 fi
 
-# By default, force-test all optional components
+# By default, removed test all optional components
 : ${PYARROW_TEST_ACERO:=${ARROW_ACERO:-OFF}}
 : ${PYARROW_TEST_AZURE:=${ARROW_AZURE:-OFF}}
 : ${PYARROW_TEST_CUDA:=${ARROW_CUDA:-OFF}}

@@ -130,11 +130,6 @@ RUN if [ "${gcc_version}" = "" ]; then \
       update-alternatives --set c++ /usr/bin/g++; \
     fi
 
-# Prioritize system packages and local installation
-# The following dependencies will be downloaded due to missing/invalid packages
-# provided by the distribution:
-# - Abseil is old
-# - libc-ares-dev does not install CMake config files
 ENV absl_SOURCE=BUNDLED \
     ARROW_PYTHON=ON \
     ARROW_BUILD_TESTS=ON \
