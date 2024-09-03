@@ -128,6 +128,7 @@ x-hierarchy:
         - conda-python-jpype
         - conda-python-spark
         - conda-python-substrait
+  - ppc64le-python
   - conda-verify-rc
   - conan
   - debian-cpp:
@@ -152,6 +153,7 @@ x-hierarchy:
     - ubuntu-python-sdist-test
     - ubuntu-r
     - ubuntu-r-only-r
+  - ppc64le-cpp
   - ubuntu-cpp-bundled
   - ubuntu-cpp-minimal
   - ubuntu-cuda-cpp:
@@ -406,6 +408,45 @@ services:
       - .:/arrow:delegated
       - ${DOCKER_VOLUME_PREFIX}ubuntu-ccache:/ccache:delegated
     command: *cpp-command
+
+  ppc64le-cpp:
+    # Usage:
+    #   docker-compose build ppc64le-cpp
+    #   docker-compose run --rm ppc64le-cpp
+    # Parameters:
+    #   ARCH: ppc64le
+    image: ppc64le/python:3.9-slim-bullseye
+    build:
+      context: .
+      dockerfile: ci/docker/ppc64le-cpp.dockerfile
+      cache_from:
+        - ppc64le/python:3.9-slim-bullseye
+      args:
+        arch: ${ARCH}
+        base: "${ARCH}/python:3.9-slim-bullseye"
+        clang_tools: ${CLANG_TOOLS}
+        llvm: ${LLVM}
+        gcc_version: ${GCC_VERSION}
+    shm_size: *shm-size
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse:/dev/fuse"
+    security_opt:
+      - apparmor:unconfined
+    ulimits: *ulimits
+    environment:
+      <<: [*common, *ccache, *sccache, *cpp]
+      ARROW_ENABLE_TIMING_TESTS:  # inherit
+      ARROW_MIMALLOC: "ON"
+    volumes: &ppc64le-cpp-volumes
+      - .:/arrow:delegated
+      - ${DOCKER_VOLUME_PREFIX}ppc64le-cpp-ccache:/ccache:delegated
+    command: &ppc64le-cpp-command >
+      /bin/bash -c "
+        /arrow/ci/scripts/cpp_build.sh /arrow /build &&
+        /arrow/ci/scripts/integration_skyhook.sh /build &&
+        /arrow/ci/scripts/cpp_test.sh /arrow /build"
 
   ubuntu-cpp-static:
     # Usage:
@@ -876,6 +917,36 @@ services:
         /arrow/ci/scripts/cpp_build.sh /arrow /build &&
         /arrow/ci/scripts/python_build.sh /arrow /build &&
         /arrow/ci/scripts/python_test.sh /arrow"]
+
+  ppc64le-python:
+    # Usage:
+    #   docker-compose build ppc64le-python
+    #   docker-compose run --rm ppc64le-python
+    # Parameters:
+    #   ARCH: ppc64le
+    #   PYTHON: 3.9
+    image: ppc64le/python:3.9-slim-bullseye
+    build:
+      context: .
+      dockerfile: ci/docker/ppc64le-python.dockerfile
+      cache_from:
+        - ppc64le/python:3.9-slim-bullseye
+      args:
+        repo: ${REPO}
+        arch: ${ARCH}
+        python: ${PYTHON}
+    shm_size: *shm-size
+    environment:
+      <<: [*common, *ccache, *sccache]
+      PYTEST_ARGS:  # inherit
+    volumes: &ppc64le-python-volumes
+      - .:/arrow:delegated
+      - ${DOCKER_VOLUME_PREFIX}ppc64le-python-ccache:/ccache:delegated
+    command: &ppc-python-command >
+      /bin/bash -c "
+        /arrow/ci/scripts/cpp_build.sh /arrow /build &&
+        /arrow/ci/scripts/ppc64le_python_build.sh /arrow /build &&
+        /arrow/ci/scripts/ppc64le_python_test.sh /arrow"
 
   conda-python-emscripten:
     # Usage:
