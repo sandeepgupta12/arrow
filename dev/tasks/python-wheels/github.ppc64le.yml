@@ -36,6 +36,11 @@ jobs:
       #PYTHON: "{{ python_version }}"
 
     steps:
+      - name: instal GIT
+        run: |
+          sudo apt-get update
+          sudo apt-get install git
+          
       {{ macros.github_checkout_arrow()|indent }}
       
 
