@@ -37,7 +37,7 @@ jobs:
 
     steps:
       {{ macros.github_checkout_arrow()|indent }}
-      #{{ macros.github_install_archery()|indent }}
+      
 
       - name: Install Pillow and Archery dependencies
         shell: bash
