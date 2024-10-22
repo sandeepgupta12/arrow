@@ -26,14 +26,14 @@ jobs:
     
     container:
       image: python:3.12-slim  # Specify the Docker image to use
-      options: --cpus 2  # You can customize container options (optional)
+      #options: --cpus 2  # You can customize container options (optional)
 
     env:
       # archery uses these environment variables
       
       ARCH: ppc64le
       ARCHERY_USE_DOCKER_CLI: 0
-      PYTHON: "{{ python_version }}"
+      #PYTHON: "{{ python_version }}"
 
     steps:
       {{ macros.github_checkout_arrow()|indent }}

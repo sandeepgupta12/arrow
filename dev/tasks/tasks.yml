@@ -402,7 +402,7 @@ tasks:
                                                  ("ppc64le", "2-28", "manylinux_2_28_ppc64le")] %}
   wheel-manylinux-{{ manylinux_version }}-{{ python_tag }}-{{ arch }}:
     ci: github
-    template: python-wheels/github.linux.yml
+    template: python-wheels/github.ppc64le.yml
     params:
       arch: "{{ arch }}"
       python_version: "{{ python_version }}"
