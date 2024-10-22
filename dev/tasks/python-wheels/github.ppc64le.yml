@@ -40,8 +40,8 @@ jobs:
         run: |
 
           apt-get update -y
-          apt-get install -y sudo
-          sudo apt-get install git
+          apt-get install -y sudo git
+         
 
       {{ macros.github_checkout_arrow()|indent }}
       
