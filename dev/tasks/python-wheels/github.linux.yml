@@ -24,6 +24,8 @@ jobs:
     name: "Build wheel for manylinux {{ manylinux_version }}"
     {% if arch == "amd64" %}
     runs-on: ubuntu-latest
+    {% elif arch == "ppc64le" %}
+    runs-on: ["self-hosted", "Linux", "ppc64le"]
     {% else %}
     runs-on: ["self-hosted", "Linux", "arm64"]
     {% endif %}
