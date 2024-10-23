@@ -42,13 +42,8 @@ jobs:
           apt-get update -y
           apt-get install -y sudo git curl libjpeg-dev zlib1g-dev python3-pip pkg-config libssl-dev
           pip install -U pip
-          
-      - name: Checkout Arrow
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          path: arrow
-          submodules: recursive
+
+      {{ macros.github_checkout_arrow()|indent }}
       
       - name: Install Rust
         run: |
