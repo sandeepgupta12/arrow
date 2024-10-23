@@ -48,10 +48,12 @@ jobs:
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
-          echo 'source $HOME/.cargo/env' >> ~/.bashrc
-          . $HOME/.cargo/env
+          source $HOME/.cargo/env
           export PATH="$HOME/.cargo/bin:$PATH"
+          rustup default stable
+          rustup update
           rustc --version  # Check Rust version to confirm installation
+          cargo --version
 
       - name: Set up Python by actions/setup-python
         if: |
