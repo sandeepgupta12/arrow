@@ -40,7 +40,7 @@ jobs:
         run: |
 
           apt-get update -y
-          apt-get install -y sudo git
+          apt-get install -y sudo git curl
          
 
       {{ macros.github_checkout_arrow()|indent }}
