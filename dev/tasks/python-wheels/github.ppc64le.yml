@@ -43,7 +43,14 @@ jobs:
           apt-get install -y sudo git curl libjpeg-dev zlib1g-dev python3-pip pkg-config libssl-dev
           pip install -U pip
 
-      {{ macros.github_checkout_arrow()|indent }}
+      - name: Install Docker
+        run: |
+          apt-get install -y docker.io
+          systemctl start docker
+          systemctl enable docker
+          
+      - name: Checkout repository
+        uses: actions/checkout@v2
       
       - name: Install Rust
         run: |
