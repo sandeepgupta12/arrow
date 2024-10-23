@@ -36,35 +36,32 @@ jobs:
       #PYTHON: "{{ python_version }}"
 
     steps:
-      - name: instal GIT
+      - name: Install dependencies
         run: |
 
           apt-get update -y
-          apt-get install -y sudo git curl
-         
+          apt-get install -y sudo git curl libjpeg-dev zlib1g-dev python3-pip
+          pip install -U pip
 
       {{ macros.github_checkout_arrow()|indent }}
       
 
-      - name: Install Pillow and Archery dependencies
-        shell: bash
-        if: runner.os == 'Linux' && runner.arch != 'X64'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libjpeg-dev zlib1g-dev python3-pip
-          pip install -U pip
-          echo "$HOME/.local/bin" >>"$GITHUB_PATH"
       
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
           echo 'source $HOME/.cargo/env' >> ~/.bashrc
           . $HOME/.cargo/env
-          echo PATH="/root/.cargo/bin:${PATH}"
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustc --version  # Check Rust version to confirm installation
 
-      {{ macros.github_install_archery()|indent }}
+      - name: Install Archery
+        run: |
+          pip install archery
 
-      {{ macros.github_login_dockerhub()|indent }}
+      - name: Login to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build wheel
         shell: bash
