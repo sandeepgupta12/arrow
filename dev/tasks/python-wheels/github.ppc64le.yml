@@ -75,7 +75,7 @@ jobs:
         shell: bash
         run: |
           . $HOME/.cargo/env  
-          pip install -e arrow/dev/archery[all]
+          pip install -e arrow/dev/archery[docker]
 
       - name: Build wheel
         shell: bash
