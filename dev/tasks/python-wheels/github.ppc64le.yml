@@ -73,7 +73,9 @@ jobs:
 
       - name: Install Archery
         shell: bash
-        run: pip install -e arrow/dev/archery[all]
+        run: |
+        . $HOME/.cargo/env  # Ensure Rust environment is sourced
+        pip install -e arrow/dev/archery[all]
 
       - name: Build wheel
         shell: bash
