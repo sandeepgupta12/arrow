@@ -45,8 +45,6 @@ jobs:
 
       {{ macros.github_checkout_arrow()|indent }}
       
-
-      
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
@@ -55,7 +53,25 @@ jobs:
           export PATH="$HOME/.cargo/bin:$PATH"
           rustc --version  # Check Rust version to confirm installation
 
-      {{ macros.github_install_archery()|indent }}
+      - name: Set up Python by actions/setup-python
+        if: |
+          !(runner.os == 'Linux' && runner.arch != 'X64')
+        uses: actions/setup-python@v4
+        with:
+          cache: 'pip'
+          python-version: 3.12
+
+      - name: Set up Python by apt
+        if: runner.os == 'Linux' && runner.arch != 'X64'
+        run: |
+          sudo apt update
+          sudo apt-get install -y python3-pip
+          pip install -U pip
+          echo "$HOME/.local/bin" >>"$GITHUB_PATH"
+
+      - name: Install Archery
+        shell: bash
+        run: pip install -e arrow/dev/archery[all]
 
       - name: Build wheel
         shell: bash
