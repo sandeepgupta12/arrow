@@ -40,7 +40,7 @@ jobs:
         run: |
 
           apt-get update -y
-          apt-get install -y sudo git curl libjpeg-dev zlib1g-dev python3-pip
+          apt-get install -y sudo git curl libjpeg-dev zlib1g-dev python3-pip pkg-config libssl-dev
           pip install -U pip
 
       {{ macros.github_checkout_arrow()|indent }}
