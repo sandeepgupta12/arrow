@@ -54,6 +54,13 @@ jobs:
           sudo apt-get install -y libjpeg-dev zlib1g-dev python3-pip
           pip install -U pip
           echo "$HOME/.local/bin" >>"$GITHUB_PATH"
+      
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+          echo 'source $HOME/.cargo/env' >> ~/.bashrc
+          . $HOME/.cargo/env
+          echo PATH="/root/.cargo/bin:${PATH}"
 
       {{ macros.github_install_archery()|indent }}
 
