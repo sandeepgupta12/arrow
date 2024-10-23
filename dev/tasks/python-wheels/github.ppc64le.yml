@@ -25,7 +25,7 @@ jobs:
     runs-on: ["self-hosted", "Linux", "ppc64le"]
     
     container:
-      image: python:3.12-slim  # Specify the Docker image to use
+      image: docker:20.10.24  # Specify the Docker image to use
       #options: --cpus 2  # You can customize container options (optional)
 
     env:
@@ -43,12 +43,6 @@ jobs:
           apt-get install -y sudo git curl libjpeg-dev zlib1g-dev python3-pip pkg-config libssl-dev
           pip install -U pip
 
-      - name: Install Docker
-        run: |
-          apt-get install -y docker.io
-          systemctl start docker
-          systemctl enable docker
-          
       - name: Checkout repository
         uses: actions/checkout@v2
       
