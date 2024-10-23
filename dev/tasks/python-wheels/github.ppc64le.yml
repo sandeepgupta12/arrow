@@ -55,15 +55,7 @@ jobs:
           export PATH="$HOME/.cargo/bin:$PATH"
           rustc --version  # Check Rust version to confirm installation
 
-      - name: Install Archery
-        run: |
-          pip install archery
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.local/bin:$PATH"
-      - name: Check Archery Installation
-        run: |
-          which archery
-          archery --version
+      {{ macros.github_install_archery()|indent }}
 
       - name: Build wheel
         shell: bash
