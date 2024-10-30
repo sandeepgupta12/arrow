@@ -15,24 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <algorithm>  // Missing include in boost/process
-
-// This boost/asio/io_context.hpp include is needless for no MinGW
-// build.
-//
-// This is for including boost/asio/detail/socket_types.hpp before any
-// "#include <windows.h>". boost/asio/detail/socket_types.hpp doesn't
-// work if windows.h is already included. boost/process.h ->
-// boost/process/args.hpp -> boost/process/detail/basic_cmd.hpp
-// includes windows.h. boost/process/args.hpp is included before
-// boost/process/async.h that includes
-// boost/asio/detail/socket_types.hpp implicitly is included.
-#include <boost/asio/io_context.hpp>
-// We need BOOST_USE_WINDOWS_H definition with MinGW when we use
-// boost/process.hpp. See BOOST_USE_WINDOWS_H=1 in
-// cpp/cmake_modules/ThirdpartyToolchain.cmake for details.
-#include <boost/process.hpp>
-
 #include "arrow/filesystem/azurefs.h"
 #include "arrow/filesystem/azurefs_internal.h"
 
@@ -53,6 +35,7 @@
 #include "arrow/result.h"
 #include "arrow/status.h"
 #include "arrow/testing/gtest_util.h"
+#include "arrow/testing/process.h"
 #include "arrow/testing/util.h"
 #include "arrow/util/future.h"
 #include "arrow/util/io_util.h"
@@ -67,7 +50,6 @@ namespace arrow {
 using internal::TemporaryDir;
 namespace fs {
 using internal::ConcatAbstractPath;
-namespace bp = boost::process;
 
 using ::testing::IsEmpty;
 using ::testing::Not;
@@ -174,42 +156,32 @@ class AzuriteEnv : public AzureEnvImpl<AzuriteEnv> {
  private:
   std::unique_ptr<TemporaryDir> temp_dir_;
   arrow::internal::PlatformFilename debug_log_path_;
-  bp::child server_process_;
+  std::unique_ptr<util::Process> server_process_;
 
   using AzureEnvImpl::AzureEnvImpl;
 
  public:
   static const AzureBackend kBackend = AzureBackend::kAzurite;
 
-  ~AzuriteEnv() override {
-    server_process_.terminate();
-    server_process_.wait();
-  }
+  ~AzuriteEnv() = default;
 
   static Result<std::unique_ptr<AzureEnvImpl>> Make() {
     auto self = std::unique_ptr<AzuriteEnv>(
         new AzuriteEnv("devstoreaccount1",
                        "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/"
                        "K1SZFPTOtr/KBHBeksoGMGw=="));
-    auto exe_path = bp::search_path("azurite");
-    if (exe_path.empty()) {
-      return Status::Invalid("Could not find Azurite emulator.");
-    }
+    self->server_process_ = std::make_unique<util::Process>();
+    ARROW_RETURN_NOT_OK(self->server_process_->SetExecutable("azurite"));
     ARROW_ASSIGN_OR_RAISE(self->temp_dir_, TemporaryDir::Make("azurefs-test-"));
     ARROW_ASSIGN_OR_RAISE(self->debug_log_path_,
                           self->temp_dir_->path().Join("debug.log"));
-    auto server_process = bp::child(
-        boost::this_process::environment(), exe_path, "--silent", "--location",
-        self->temp_dir_->path().ToString(), "--debug", self->debug_log_path_.ToString(),
-        // For old Azurite. We can't install the latest Azurite with
-        // old Node.js on old Ubuntu.
-        "--skipApiVersionCheck");
-    if (!server_process.valid() || !server_process.running()) {
-      server_process.terminate();
-      server_process.wait();
-      return Status::Invalid("Could not start Azurite emulator.");
-    }
-    self->server_process_ = std::move(server_process);
+    self->server_process_->SetArgs({"--silent", "--location",
+                                    self->temp_dir_->path().ToString(), "--debug",
+                                    self->debug_log_path_.ToString(),
+                                    // For old Azurite. We can't install the latest
+                                    // Azurite with old Node.js on old Ubuntu.
+                                    "--skipApiVersionCheck"});
+    ARROW_RETURN_NOT_OK(self->server_process_->Execute());
     return self;
   }
 
@@ -392,9 +364,9 @@ class TestGeneric : public ::testing::Test, public GenericFileSystemTest {
   std::shared_ptr<FileSystem> GetEmptyFileSystem() override { return fs_; }
 
   bool have_implicit_directories() const override { return true; }
-  bool allow_write_file_over_dir() const override { return true; }
-  bool allow_read_dir_as_file() const override { return true; }
-  bool allow_move_dir() const override { return false; }
+  bool allow_write_file_over_dir() const override { return false; }
+  bool allow_read_dir_as_file() const override { return false; }
+  bool allow_move_dir() const override { return true; }
   bool allow_move_file() const override { return true; }
   bool allow_append_to_file() const override { return true; }
   bool have_directory_mtimes() const override { return true; }
@@ -432,7 +404,11 @@ class TestAzuriteGeneric : public TestGeneric {
   }
 
  protected:
-  // Azurite doesn't support moving files over containers.
+  // Azurite doesn't block writing files over directories.
+  bool allow_write_file_over_dir() const override { return true; }
+  // Azurite doesn't support moving directories.
+  bool allow_move_dir() const override { return false; }
+  // Azurite doesn't support moving files.
   bool allow_move_file() const override { return false; }
   // Azurite doesn't support directory mtime.
   bool have_directory_mtimes() const override { return false; }
@@ -454,7 +430,11 @@ class TestAzureFlatNSGeneric : public TestGeneric {
   }
 
  protected:
-  // Flat namespace account doesn't support moving files over containers.
+  // Flat namespace account doesn't block writing files over directories.
+  bool allow_write_file_over_dir() const override { return true; }
+  // Flat namespace account doesn't support moving directories.
+  bool allow_move_dir() const override { return false; }
+  // Flat namespace account doesn't support moving files.
   bool allow_move_file() const override { return false; }
   // Flat namespace account doesn't support directory mtime.
   bool have_directory_mtimes() const override { return false; }
@@ -590,16 +570,15 @@ class TestAzureOptions : public ::testing::Test {
 
   void TestFromUriAbfs() {
     std::string path;
-    ASSERT_OK_AND_ASSIGN(
-        auto options,
-        AzureOptions::FromUri(
-            "abfs://account:password@127.0.0.1:10000/container/dir/blob", &path));
+    ASSERT_OK_AND_ASSIGN(auto options,
+                         AzureOptions::FromUri(
+                             "abfs://account@127.0.0.1:10000/container/dir/blob", &path));
     ASSERT_EQ(options.account_name, "account");
     ASSERT_EQ(options.blob_storage_authority, "127.0.0.1:10000");
     ASSERT_EQ(options.dfs_storage_authority, "127.0.0.1:10000");
     ASSERT_EQ(options.blob_storage_scheme, "https");
     ASSERT_EQ(options.dfs_storage_scheme, "https");
-    ASSERT_EQ(options.credential_kind_, AzureOptions::CredentialKind::kStorageSharedKey);
+    ASSERT_EQ(options.credential_kind_, AzureOptions::CredentialKind::kDefault);
     ASSERT_EQ(path, "container/dir/blob");
     ASSERT_EQ(options.background_writes, true);
   }
@@ -607,43 +586,42 @@ class TestAzureOptions : public ::testing::Test {
   void TestFromUriAbfss() {
     std::string path;
     ASSERT_OK_AND_ASSIGN(
-        auto options,
-        AzureOptions::FromUri(
-            "abfss://account:password@127.0.0.1:10000/container/dir/blob", &path));
+        auto options, AzureOptions::FromUri(
+                          "abfss://account@127.0.0.1:10000/container/dir/blob", &path));
     ASSERT_EQ(options.account_name, "account");
     ASSERT_EQ(options.blob_storage_authority, "127.0.0.1:10000");
     ASSERT_EQ(options.dfs_storage_authority, "127.0.0.1:10000");
     ASSERT_EQ(options.blob_storage_scheme, "https");
     ASSERT_EQ(options.dfs_storage_scheme, "https");
-    ASSERT_EQ(options.credential_kind_, AzureOptions::CredentialKind::kStorageSharedKey);
+    ASSERT_EQ(options.credential_kind_, AzureOptions::CredentialKind::kDefault);
     ASSERT_EQ(path, "container/dir/blob");
     ASSERT_EQ(options.background_writes, true);
   }
 
   void TestFromUriEnableTls() {
     std::string path;
-    ASSERT_OK_AND_ASSIGN(auto options,
-                         AzureOptions::FromUri(
-                             "abfs://account:password@127.0.0.1:10000/container/dir/blob?"
-                             "enable_tls=false",
-                             &path));
+    ASSERT_OK_AND_ASSIGN(
+        auto options,
+        AzureOptions::FromUri("abfs://account@127.0.0.1:10000/container/dir/blob?"
+                              "enable_tls=false",
+                              &path));
     ASSERT_EQ(options.account_name, "account");
     ASSERT_EQ(options.blob_storage_authority, "127.0.0.1:10000");
     ASSERT_EQ(options.dfs_storage_authority, "127.0.0.1:10000");
     ASSERT_EQ(options.blob_storage_scheme, "http");
     ASSERT_EQ(options.dfs_storage_scheme, "http");
-    ASSERT_EQ(options.credential_kind_, AzureOptions::CredentialKind::kStorageSharedKey);
+    ASSERT_EQ(options.credential_kind_, AzureOptions::CredentialKind::kDefault);
     ASSERT_EQ(path, "container/dir/blob");
     ASSERT_EQ(options.background_writes, true);
   }
 
   void TestFromUriDisableBackgroundWrites() {
     std::string path;
-    ASSERT_OK_AND_ASSIGN(auto options,
-                         AzureOptions::FromUri(
-                             "abfs://account:password@127.0.0.1:10000/container/dir/blob?"
-                             "background_writes=false",
-                             &path));
+    ASSERT_OK_AND_ASSIGN(
+        auto options,
+        AzureOptions::FromUri("abfs://account@127.0.0.1:10000/container/dir/blob?"
+                              "background_writes=false",
+                              &path));
     ASSERT_EQ(options.background_writes, false);
   }
 
@@ -663,15 +641,6 @@ class TestAzureOptions : public ::testing::Test {
                               "credential_kind=anonymous",
                               nullptr));
     ASSERT_EQ(options.credential_kind_, AzureOptions::CredentialKind::kAnonymous);
-  }
-
-  void TestFromUriCredentialStorageSharedKey() {
-    ASSERT_OK_AND_ASSIGN(
-        auto options,
-        AzureOptions::FromUri(
-            "abfs://:password@account.blob.core.windows.net/container/dir/blob",
-            nullptr));
-    ASSERT_EQ(options.credential_kind_, AzureOptions::CredentialKind::kStorageSharedKey);
   }
 
   void TestFromUriCredentialClientSecret() {
@@ -795,9 +764,6 @@ TEST_F(TestAzureOptions, FromUriDisableBackgroundWrites) {
 }
 TEST_F(TestAzureOptions, FromUriCredentialDefault) { TestFromUriCredentialDefault(); }
 TEST_F(TestAzureOptions, FromUriCredentialAnonymous) { TestFromUriCredentialAnonymous(); }
-TEST_F(TestAzureOptions, FromUriCredentialStorageSharedKey) {
-  TestFromUriCredentialStorageSharedKey();
-}
 TEST_F(TestAzureOptions, FromUriCredentialClientSecret) {
   TestFromUriCredentialClientSecret();
 }
@@ -2107,6 +2073,20 @@ void TestAzureFileSystem::TestGetFileInfoObjectWithNestedStructure() {
   ASSERT_OK(output->Write(lorem_ipsum));
   ASSERT_OK(output->Close());
 
+  // . is immediately before "/" lexicographically, ensure that this doesn't
+  // cause unexpected issues. NOTE: Its seems real Azure blob storage doesn't
+  // allow blob names to end in `.`
+  ASSERT_OK_AND_ASSIGN(output, fs()->OpenOutputStream(
+                                   data.ContainerPath("test-object-dir/some_other_dir.a"),
+                                   /*metadata=*/{}));
+  ASSERT_OK(output->Write(lorem_ipsum));
+  ASSERT_OK(output->Close());
+  ASSERT_OK_AND_ASSIGN(output,
+                       fs()->OpenOutputStream(data.ContainerPath(kObjectName + ".a"),
+                                              /*metadata=*/{}));
+  ASSERT_OK(output->Write(lorem_ipsum));
+  ASSERT_OK(output->Close());
+
   AssertFileInfo(fs(), data.ContainerPath(kObjectName), FileType::File);
   AssertFileInfo(fs(), data.ContainerPath(kObjectName) + "/", FileType::NotFound);
   AssertFileInfo(fs(), data.ContainerPath("test-object-dir"), FileType::Directory);
@@ -2349,6 +2329,24 @@ TYPED_TEST(TestAzureFileSystemOnAllScenarios, CreateContainerFromPath) {
 TYPED_TEST(TestAzureFileSystemOnAllScenarios, MovePath) { this->TestMovePath(); }
 
 // Tests using Azurite (the local Azure emulator)
+
+TEST_F(TestAzuriteFileSystem, CheckIfHierarchicalNamespaceIsEnabledRuntimeError) {
+  ASSERT_OK(options_.ConfigureAccountKeyCredential("not-base64"));
+  ASSERT_OK_AND_ASSIGN(auto datalake_service_client,
+                       options_.MakeDataLakeServiceClient());
+  auto adlfs_client = datalake_service_client->GetFileSystemClient("nonexistent");
+  ASSERT_RAISES(UnknownError,
+                internal::CheckIfHierarchicalNamespaceIsEnabled(adlfs_client, options_));
+}
+
+TEST_F(TestAzuriteFileSystem, CheckIfHierarchicalNamespaceIsEnabledTransportError) {
+  options_.dfs_storage_authority = "127.0.0.1:20000";  // Wrong port
+  ASSERT_OK_AND_ASSIGN(auto datalake_service_client,
+                       options_.MakeDataLakeServiceClient());
+  auto adlfs_client = datalake_service_client->GetFileSystemClient("nonexistent");
+  ASSERT_RAISES(IOError,
+                internal::CheckIfHierarchicalNamespaceIsEnabled(adlfs_client, options_));
+}
 
 TEST_F(TestAzuriteFileSystem, GetFileInfoSelector) {
   SetUpSmallFileSystemTree();

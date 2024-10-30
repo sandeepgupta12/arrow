@@ -226,6 +226,11 @@ cdef class UuidType(BaseExtensionType):
     cdef:
         const CUuidType* uuid_ext_type
 
+cdef class JsonType(BaseExtensionType):
+    cdef:
+        const CJsonType* json_ext_type
+
+
 cdef class PyExtensionType(ExtensionType):
     pass
 
@@ -506,6 +511,8 @@ cdef class ChunkedArray(_PandasConvertible):
     cdef:
         shared_ptr[CChunkedArray] sp_chunked_array
         CChunkedArray* chunked_array
+        c_bool _is_cpu
+        c_bool _init_is_cpu
 
     cdef readonly:
         # To allow Table to propagate metadata to pandas.Series
@@ -516,13 +523,15 @@ cdef class ChunkedArray(_PandasConvertible):
 
 
 cdef class _Tabular(_PandasConvertible):
-    pass
+    cdef void _assert_cpu(self) except *
 
 
 cdef class Table(_Tabular):
     cdef:
         shared_ptr[CTable] sp_table
         CTable* table
+        c_bool _is_cpu
+        c_bool _init_is_cpu
 
     cdef void init(self, const shared_ptr[CTable]& table)
 

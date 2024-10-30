@@ -376,6 +376,7 @@ set(ARROW_SRCS
     device_allocation_type_set.cc
     extension_type.cc
     extension/bool8.cc
+    extension/json.cc
     extension/uuid.cc
     pretty_print.cc
     record_batch.cc
@@ -459,7 +460,7 @@ endif()
 
 set(ARROW_VENDORED_SRCS
     vendored/base64.cpp
-    vendored/datetime/tz.cpp
+    vendored/datetime.cpp
     vendored/double-conversion/bignum-dtoa.cc
     vendored/double-conversion/bignum.cc
     vendored/double-conversion/cached-powers.cc
@@ -487,7 +488,7 @@ set(ARROW_VENDORED_SRCS
 if(APPLE)
   list(APPEND ARROW_VENDORED_SRCS vendored/datetime/ios.mm)
 endif()
-set_source_files_properties(vendored/datetime/tz.cpp
+set_source_files_properties(vendored/datetime.cpp
                             PROPERTIES SKIP_PRECOMPILE_HEADERS ON
                                        SKIP_UNITY_BUILD_INCLUSION ON)
 arrow_add_object_library(ARROW_VENDORED ${ARROW_VENDORED_SRCS})
@@ -644,9 +645,13 @@ else()
 endif()
 
 set(ARROW_TESTING_SHARED_LINK_LIBS arrow_shared ${ARROW_GTEST_GTEST})
-set(ARROW_TESTING_SHARED_PRIVATE_LINK_LIBS arrow::flatbuffers RapidJSON)
-set(ARROW_TESTING_STATIC_LINK_LIBS arrow::flatbuffers RapidJSON arrow_static
-                                   ${ARROW_GTEST_GTEST})
+set(ARROW_TESTING_SHARED_PRIVATE_LINK_LIBS arrow::flatbuffers RapidJSON Boost::process)
+set(ARROW_TESTING_STATIC_LINK_LIBS
+    arrow::flatbuffers
+    RapidJSON
+    Boost::process
+    arrow_static
+    ${ARROW_GTEST_GTEST})
 set(ARROW_TESTING_SHARED_INSTALL_INTERFACE_LIBS Arrow::arrow_shared)
 set(ARROW_TESTING_STATIC_INSTALL_INTERFACE_LIBS Arrow::arrow_static)
 # that depend on gtest
@@ -667,9 +672,10 @@ set(ARROW_TESTING_SRCS
     io/test_common.cc
     ipc/test_common.cc
     testing/fixed_width_test_util.cc
-    testing/gtest_util.cc
-    testing/random.cc
     testing/generator.cc
+    testing/gtest_util.cc
+    testing/process.cc
+    testing/random.cc
     testing/util.cc)
 
 #
@@ -1212,6 +1218,7 @@ add_arrow_test(sparse_tensor_test)
 add_arrow_test(stl_test SOURCES stl_iterator_test.cc stl_test.cc)
 
 add_arrow_benchmark(builder_benchmark)
+add_arrow_benchmark(chunk_resolver_benchmark)
 add_arrow_benchmark(compare_benchmark)
 add_arrow_benchmark(memory_pool_benchmark)
 add_arrow_benchmark(type_benchmark)
