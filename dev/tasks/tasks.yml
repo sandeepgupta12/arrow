@@ -461,6 +461,18 @@ tasks:
 {% endif %}
 {% endfor %}
 
+{############################## Wheel Linux ppc64le ####################################}
+
+  wheel-cp39-ppc64le:
+    ci: github
+    template: python-wheels/github.ppc64le.yml
+    params:
+      arch: "ppc64le"
+      python_version: "3.9"
+      wheel_platform_tag: "linux_ppc64le"
+    artifacts:
+      - pyarrow-{no_rc_version}-cp39-cp39-linux_ppc64le.whl
+
 {############################ Python sdist ####################################}
 
   python-sdist:

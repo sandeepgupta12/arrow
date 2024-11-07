@@ -178,6 +178,8 @@ x-hierarchy:
   - python-free-threaded-wheel-manylinux-test-unittests
   - python-wheel-windows-vs2019
   - python-wheel-windows-test
+  - ppc64le-python-wheel
+  - ppc64le-python-wheel-test-imports
 
 volumes:
   almalinux-ccache:
@@ -202,6 +204,12 @@ volumes:
     name: python-wheel-windows-clcache
   ubuntu-ccache:
     name: ${ARCH}-ubuntu-${UBUNTU}-ccache
+  ppc64le-python-wheel-ccache:
+    name: ppc64le-python-wheel-ccache
+  ppc64le-python-ccache:
+    name: ppc64le-python-ccache
+  ppc64le-cpp-ccache:
+    name: ppc64le-cpp-ccache
 
 services:
 
@@ -1182,6 +1190,43 @@ services:
       ARROW_WITH_OPENTELEMETRY: "OFF"
     volumes: *ubuntu-volumes
     command: *python-command
+  
+  ############################ PPC64LE Python wheels ##################################
+
+  # See available versions at:
+  #    https://quay.io/repository/pypa/manylinux2014_x86_64?tab=tags
+  ppc64le-python-wheel:
+    image: ppc64le/python:3.9-slim-bullseye
+    build:
+      context: .
+      dockerfile: ci/docker/ppc64le-python.dockerfile
+      cache_from:
+        - ppc64le/python:3.9-slim-bullseye
+      
+    environment:
+      <<: [*common, *ccache]
+    volumes:
+      - .:/arrow:delegated
+      - ${DOCKER_VOLUME_PREFIX}ppc64le-python-wheel-ccache:/ccache:delegated
+    command: &ppc-python-command >
+      /bin/bash -c "
+        /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
+
+  ppc64le-python-wheel-test-imports:
+    image: ppc64le/python:3.9-slim-bullseye
+    build:
+      context: .
+      dockerfile: ci/docker/ppc64le-python.dockerfile
+      cache_from:
+        - ppc64le/python:3.9-slim-bullseye
+    
+    volumes:
+      - .:/arrow:delegated
+    environment:
+      <<: *common
+      CHECK_IMPORTS: "ON"
+      CHECK_UNITTESTS: "OFF"
+    command: /arrow/ci/scripts/ppc64le_python_wheel_unix_test.sh /arrow
 
   ############################ Python wheels ##################################
 
