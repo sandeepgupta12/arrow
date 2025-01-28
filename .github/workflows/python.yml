@@ -140,7 +140,7 @@ jobs:
 
   ppc64le-python:
     name: ${{ matrix.title }}
-    runs-on: ["self-hosted", "ppc64le", "linux"]
+    runs-on: "linux.ppc64le"
     if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     timeout-minutes: 60
     strategy:

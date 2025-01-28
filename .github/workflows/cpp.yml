@@ -105,7 +105,7 @@ jobs:
             "clang-tools": "13",
             "image": "ppc64le-cpp",
             "llvm": "13",
-            "runs-on": ["self-hosted", "ppc64le", "linux"],
+            "runs-on": "linux.ppc64le",
             "title": "PPC64LE C++",
             "ubuntu": "22.04"
           }
