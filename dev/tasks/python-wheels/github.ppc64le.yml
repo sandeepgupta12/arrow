@@ -22,7 +22,7 @@
 jobs:
   build:
     name: "Build wheel for ppc64le"
-    runs-on: ["self-hosted", "Linux", "ppc64le"]
+    runs-on: linux.ppc64le
 
     env:
       # archery uses these environment variables
