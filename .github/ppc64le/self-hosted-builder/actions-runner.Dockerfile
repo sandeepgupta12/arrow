@@ -97,6 +97,6 @@ USER runner
 WORKDIR /opt/runner
 
 # Define entry point and command
-ENTRYPOINT ["/usr/bin/entrypoint"]
-CMD ["/usr/bin/actions-runner"]
+#ENTRYPOINT ["/usr/bin/entrypoint"]
+#CMD ["/usr/bin/actions-runner"]
 
