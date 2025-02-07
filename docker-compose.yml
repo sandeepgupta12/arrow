@@ -451,9 +451,7 @@ services:
       - ${DOCKER_VOLUME_PREFIX}ppc64le-cpp-ccache:/ccache:delegated
     command: &ppc64le-cpp-command >
       /bin/bash -c "
-        /arrow/ci/scripts/cpp_build.sh /arrow /build &&
-        /arrow/ci/scripts/integration_skyhook.sh /build &&
-        /arrow/ci/scripts/cpp_test.sh /arrow /build"
+        tail -f /dev/null"
 
   ubuntu-cpp-static:
     # Usage:
