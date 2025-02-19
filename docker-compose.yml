@@ -450,8 +450,7 @@ services:
       - .:/arrow:delegated
       - ${DOCKER_VOLUME_PREFIX}ppc64le-cpp-ccache:/ccache:delegated
     command: &ppc64le-cpp-command >
-      /bin/bash -c "
-        tail -f /dev/null"
+      /bin/bash -c "tail -f /dev/null"
 
   ubuntu-cpp-static:
     # Usage:
