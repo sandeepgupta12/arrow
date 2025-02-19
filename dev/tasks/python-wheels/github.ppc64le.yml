@@ -44,7 +44,7 @@ jobs:
       - name: Debug List script directory
         shell: bash
         run: |
-          archery docker run ppc64le-python-wheel ls -lah /arrow/ci/scripts/
+          archery docker run ppc64le-python-wheel -- ls -lah /arrow/ci/scripts/
       - name: Build wheel
         shell: bash
         run: archery docker run -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} ppc64le-python-wheel
