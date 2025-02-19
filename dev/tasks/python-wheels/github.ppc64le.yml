@@ -40,9 +40,6 @@ jobs:
 
       - name: Setup Archery
         run: pip install -e arrow/dev/archery[docker]
-      - name: Debug
-        shell: bash
-        run: archery docker run ppc64le-python-wheel "/bin/bash -c 'ls -l /arrow/ci/scripts/'"
       
       - name: Build wheel
         shell: bash
