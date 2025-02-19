@@ -41,7 +41,7 @@ jobs:
       - name: Setup Archery
         run: pip install -e arrow/dev/archery[docker]
 
-      - name: Debug: List script directory
+      - name: Debug List script directory
         shell: bash
         run: |
           archery docker run ppc64le-python-wheel ls -lah /arrow/ci/scripts/
