@@ -59,3 +59,6 @@ RUN pip install -r /arrow/python/requirements-test.txt
 
 RUN pip install ninja
 
+COPY ci/scripts/ppc64le-python-wheel.sh /arrow/ci/scripts/ppc64le-python-wheel.sh
+RUN chmod +x /arrow/ci/scripts/ppc64le-python-wheel.sh
+
