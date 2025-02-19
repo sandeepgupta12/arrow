@@ -51,14 +51,23 @@ RUN apt-get update -y -q && \
 
 RUN pip install Cython==3.0.8 numpy
 
-COPY python/requirements-build.txt /arrow/python/
-RUN pip install -r /arrow/python/requirements-build.txt
+#COPY python/requirements-build.txt /arrow/python/
 
-COPY python/requirements-test.txt /arrow/python/
-RUN pip install -r /arrow/python/requirements-test.txt
+
+#COPY python/requirements-test.txt /arrow/python/
+
 
 RUN pip install ninja
 
+RUN ls -lR
 COPY . /arrow
+
+RUN echo "-----------------------"
+RUN ls -lR /arrow
+
+RUN pip install -r /arrow/python/requirements-build.txt
+
+RUN pip install -r /arrow/python/requirements-test.txt
+
 RUN chmod +x /arrow/ci/scripts/ppc64le-python-wheel.sh
 
