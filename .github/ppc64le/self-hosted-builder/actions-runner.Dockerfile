@@ -24,7 +24,6 @@ RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout="10" && \
     vim \
     zip \
     python3 \
-    python3.10-dev \
     python3-pip && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -32,12 +31,10 @@ RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout="10" && \
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && \
     update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
-
-# Add Docker GPG key and repository
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
-    echo "deb [arch=ppc64el signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list && \
-    apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io && \
+# Install Podman and podman-docker (Docker compatibility)
+RUN apt-get update && apt-get install -y podman podman-docker && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Install dotnet SDK and other dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -57,13 +54,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN useradd -c "Action Runner" -m runner && \
     usermod -L runner && \
     echo "runner ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/runner && \
-    groupadd docker || true && \
-    usermod -aG docker runner && \
-    (test -S /var/run/docker.sock && chmod 660 /var/run/docker.sock && chgrp docker /var/run/docker.sock || true)
+    groupadd podman || true && \
+    usermod -aG podman runner
 
-
-# Add local bin to PATH for the runner user.
-ENV PATH="/home/runner/.local/bin:${PATH}"
+# Configure Podman cgroup manager
+RUN mkdir -p /etc/containers && \
+    echo "[engine]\ncgroup_manager = \"cgroupfs\"" | sudo tee /etc/containers/containers.conf
 
 # Add and configure GitHub Actions runner
 ARG RUNNERREPO="https://github.com/actions/runner"
@@ -103,4 +99,3 @@ WORKDIR /opt/runner
 # Define entry point and command
 ENTRYPOINT ["/usr/bin/entrypoint"]
 CMD ["/usr/bin/actions-runner"]
-
