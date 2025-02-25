@@ -40,6 +40,15 @@ jobs:
 
       - name: Setup Archery
         run: pip install -e arrow/dev/archery[docker]
+
+      - name: Debug Archery Installation
+        shell: bash
+        run: |
+          echo "PATH: $PATH"
+          which archery || echo "Archery not found in PATH"
+          python3 -m pip list | grep archery || echo "Archery not installed"
+          ls -l ~/.local/bin/ | grep archery || echo "Archery not in ~/.local/bin"
+
       
       - name: Build wheel
         shell: bash
