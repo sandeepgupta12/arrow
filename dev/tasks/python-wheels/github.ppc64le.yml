@@ -50,6 +50,8 @@ jobs:
         run: |
           echo "PATH: $PATH"
           which archery || echo "Archery not found in PATH"
+          find ~/.local/bin/ -name "archery"
+          find /opt/runner/ -name "archery"
           python3 -m pip list | grep archery || echo "Archery not installed"
           ls -l ~/.local/bin/ | grep archery || echo "Archery not in ~/.local/bin"
 
