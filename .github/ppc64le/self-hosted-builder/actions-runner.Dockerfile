@@ -32,8 +32,10 @@ RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && \
     update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
 # Install Podman and podman-docker (Docker compatibility)
-RUN apt-get update && apt-get install -y podman podman-docker podman-compose && \
+RUN apt-get update && apt-get install -y podman podman-docker && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --user podman-compose
 
 
 # Install dotnet SDK and other dependencies
