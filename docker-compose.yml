@@ -946,7 +946,7 @@ services:
     volumes: &ppc64le-python-volumes
       - .:/arrow:delegated
       - ${DOCKER_VOLUME_PREFIX}ppc64le-python-ccache:/ccache:delegated
-    command: &ppc-python-command >
+    command: &ppc-python-command_1 >
       /bin/bash -c "
         /arrow/ci/scripts/cpp_build.sh /arrow /build &&
         /arrow/ci/scripts/ppc64le_python_build.sh /arrow /build &&
