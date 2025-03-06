@@ -1204,7 +1204,7 @@ services:
       <<: [*common, *ccache]
     volumes:
       - /opt/runner/_work/crossbow/crossbow:/arrow:delegated
-      - ${DOCKER_VOLUME_PREFIX}ppc64le-python-wheel-ccache:/ccache:delegated
+      - ./ci/scripts/ppc64le-python-wheel.sh:/arrow/ci/scripts/ppc64le-python-wheel.sh:ro
     command: &ppc-python-command >
       /bin/bash -c "
         /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
