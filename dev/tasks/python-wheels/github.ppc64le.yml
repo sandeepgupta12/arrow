@@ -62,7 +62,7 @@ jobs:
 
       - name: Copy built wheel to host
         run: |
-          CONTAINER_ID=$(docker ps -a --filter "name=ppc64le-python-wheel" --format "{{.ID}}")
+          CONTAINER_ID=$(docker ps -a --filter "name=ppc64le-python-wheel" --format "{% raw %}{{.ID}}{% endraw %}")
           docker cp $CONTAINER_ID:/arrow/python/repaired_wheels ./output
           docker stop $CONTAINER_ID && docker rm $CONTAINER_ID
 
