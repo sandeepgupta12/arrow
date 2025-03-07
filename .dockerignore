@@ -25,8 +25,8 @@
 **
 
 # include explicitly
-!cpp/**              # Allow C++ source files
-!python/**           # Allow Python source files
+!cpp/**           
+!python/**
 !ci/**
 !c_glib/Gemfile
 !dev/release/setup-*.sh

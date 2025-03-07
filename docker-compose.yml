@@ -1206,7 +1206,11 @@ services:
       /bin/bash -c "
         cp -r /arrow /build_arrow &&
         ls -lR /build_arrow &&
-        /build_arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
+        /build_arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build &&
+        echo 'Build completed. Copying wheel to host...' &&
+        CONTAINER_ID=$(docker ps -aqf 'name=ppc64le-python-wheel') &&
+        docker cp \$CONTAINER_ID:/arrow/python/repaired_wheels /host_output &&
+        echo 'Wheel copied to /host_output inside outer container.'""
 
   ppc64le-python-wheel-test-imports:
     image: ppc64le/python:3.9-slim-bullseye
