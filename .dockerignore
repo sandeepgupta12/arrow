@@ -22,7 +22,6 @@
 # as a mounted directory.
 
 # exclude everything
-**
 
 # include explicitly
 !cpp/**              # Allow C++ source files
