@@ -84,5 +84,5 @@ RUN pip install -r /arrow/python/requirements-build.txt
 
 RUN pip install -r /arrow/python/requirements-test.txt
 
-RUN chmod +x /arrow/ci/scripts/ppc64le-python-wheel.sh
+#RUN chmod +x /arrow/ci/scripts/ppc64le-python-wheel.sh
 
