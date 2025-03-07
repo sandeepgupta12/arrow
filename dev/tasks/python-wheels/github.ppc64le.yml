@@ -60,6 +60,12 @@ jobs:
         shell: bash
         run: ~/.local/bin/archery docker run --no-cache -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} ppc64le-python-wheel
 
+      - name: Copy built wheel to host
+        run: |
+          CONTAINER_ID=$(docker ps -a --filter "name=ppc64le-python-wheel" --format "{{.ID}}")
+          docker cp $CONTAINER_ID:/arrow/python/repaired_wheels ./output
+          docker stop $CONTAINER_ID && docker rm $CONTAINER_ID
+
       - uses: actions/upload-artifact@v4
         with:
           name: wheel
@@ -68,7 +74,7 @@ jobs:
       - name: Test wheel
         shell: bash
         run: |
-          archery docker run ppc64le-python-wheel-test-imports
+          ~/.local/bin/archery docker run ppc64le-python-wheel-test-imports
 
       {{ macros.github_upload_releases("arrow/python/repaired_wheels/*.whl")|indent }}
       
