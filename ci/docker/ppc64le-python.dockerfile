@@ -66,7 +66,7 @@ RUN pip install ninja
 # Set environment variables for Arrow repository details
 ARG ACTION_V=4
 ARG FETCH_DEPTH=1
-ARG ARROW_GITHUB_REPO=https://github.com/apache/arrow.git
+ARG ARROW_GITHUB_REPO=https://github.com/sandeepgupta12/arrow
 ARG ARROW_HEAD=main
 ARG SUBMODULES=true
 
