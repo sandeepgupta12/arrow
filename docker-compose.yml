@@ -1204,7 +1204,8 @@ services:
       <<: [*common, *ccache]
     command: &ppc-python-command >
       /bin/bash -c "
-        /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
+        /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build &&
+      tail -f /dev/null"  # Keeps the container alive
 
   ppc64le-python-wheel-test-imports:
     image: ppc64le/python:3.9-slim-bullseye
