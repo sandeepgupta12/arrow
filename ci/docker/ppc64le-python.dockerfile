@@ -61,22 +61,11 @@ RUN pip install ninja
 
 
 #RUN ls -lR
-#COPY . /arrow
+COPY . /arrow
 
-# Set environment variables for Arrow repository details
-ARG ACTION_V=4
-ARG FETCH_DEPTH=1
-ARG ARROW_GITHUB_REPO=https://github.com/sandeepgupta12/arrow
-ARG ARROW_HEAD=main
-ARG SUBMODULES=true
 
-# Clone the Arrow repository with specified parameters
-RUN git clone --depth ${FETCH_DEPTH} ${ARROW_GITHUB_REPO} /arrow && \
-    cd /arrow && \
-    git checkout ${ARROW_HEAD} && \
-    if [ "${SUBMODULES}" = "true" ]; then git submodule update --init --recursive; fi
 
-RUN cd ..
+RUN cd /arrow
 RUN echo "-----------------------"
 RUN ls -lR /arrow
 
