@@ -48,3 +48,5 @@
 !ruby/red-parquet/Gemfile
 !ruby/red-parquet/lib/parquet/version.rb
 !ruby/red-parquet/red-parquet.gemspec
+!.github/**
+!dev/**
