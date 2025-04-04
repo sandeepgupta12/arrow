@@ -1199,17 +1199,14 @@ services:
       dockerfile: ci/docker/ppc64le-python.dockerfile
       cache_from:
         - ppc64le/python:3.9-slim-bullseye
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    
 
     environment:
       <<: [*common, *ccache]
     command: &ppc-python-command >
       /bin/bash -c "
         git clone --recursive --depth=1 https://github.com/sandeepgupta12/arrow /arrow &&
-        /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build &&
-        docker cp actions-runner.ppc64le:/arrow/python/repaired_wheels/* . &&
-      tail -f /dev/null"  # Keeps the container alive
+        /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build
 
   ppc64le-python-wheel-test-imports:
     image: ppc64le/python:3.9-slim-bullseye
