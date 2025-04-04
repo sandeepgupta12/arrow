@@ -1205,8 +1205,9 @@ services:
       <<: [*common, *ccache]
     command: &ppc-python-command >
       /bin/bash -c "
-        
-        /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build "  
+        git clone --recursive --depth=1 https://github.com/sandeepgupta12/arrow /arrow &&
+        /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build &&
+        tail -f /dev/null "  
 
   ppc64le-python-wheel-test-imports:
     image: ppc64le/python:3.9-slim-bullseye
