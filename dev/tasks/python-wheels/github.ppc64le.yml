@@ -50,7 +50,7 @@ jobs:
       - name: Build wheel
         shell: bash
         run: |
-          ~/.local/bin/archery docker run --no-cache -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} ppc64le-python-wheel
+          ~/.local/bin/archery docker run --no-cache --rm=false -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} ppc64le-python-wheel
 
       - name: Copy built wheel to host
         run: |
