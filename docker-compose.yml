@@ -1199,8 +1199,8 @@ services:
       dockerfile: ci/docker/ppc64le-python.dockerfile
       cache_from:
         - ppc64le/python:3.9-slim-bullseye
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
     environment:
       <<: [*common, *ccache]
