@@ -55,6 +55,12 @@ jobs:
            --docker-args="-d --name $CONTAINER_NAME" \
            ppc64le-python-wheel
 
+          # Wait for container to finish
+          echo "Waiting for container to finish..."
+          while [ "$(docker inspect -f '{{.State.Running}}' $CONTAINER_NAME)" == "true" ]; do
+            sleep 10
+          done
+
       - name: Copy built wheel to host
         run: |
           CONTAINER_ID=$(docker ps -aq --filter "name=ppc64le-python-wheel")
