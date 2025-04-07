@@ -1206,7 +1206,8 @@ services:
     command: &ppc-python-command >
       /bin/bash -c "
         /arrow/ci/scripts/ppc64le-clone-code.sh &&
-        /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"  
+        cd /arrow &&
+        ./ci/scripts/ppc64le-python-wheel.sh /arrow /build"  
 
   ppc64le-python-wheel-test-imports:
     image: ppc64le/python:3.9-slim-bullseye
