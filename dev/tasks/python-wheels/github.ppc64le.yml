@@ -51,9 +51,17 @@ jobs:
         shell: bash
         run: |
           ~/.local/bin/archery docker run --no-cache -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} ppc64le-python-wheel &
-          BUILD_PID=$!
-          wait $BUILD_PID
+          echo "Waiting for container to start..."
+          CONTAINER_ID=""
+          until [ -n "$CONTAINER_ID" ]; do
+            CONTAINER_ID=$(docker ps -aq --filter "name=ppc64le-python-wheel")
+            sleep 2
+          done
 
+          echo "Waiting for wheel build to finish..."
+          until docker exec "$CONTAINER_ID" test -f /arrow/build/DONE; do
+            sleep 10
+          done
       - name: Copy built wheel to host
         run: |
           CONTAINER_ID=$(docker ps -aq --filter "name=ppc64le-python-wheel")
