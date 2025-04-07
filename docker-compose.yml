@@ -1207,8 +1207,8 @@ services:
       /bin/bash -c "
         git clone --recursive --depth=1 https://github.com/sandeepgupta12/arrow /arrow &&
         /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build;
-        mkdir -p /arrow/build;
-        touch /arrow/build/DONE;
+        mkdir -p /arrow/build &&
+        touch /arrow/build/DONE &&
         tail -f /dev/null"  
 
   ppc64le-python-wheel-test-imports:
