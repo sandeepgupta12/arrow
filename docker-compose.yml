@@ -210,6 +210,8 @@ volumes:
     name: ppc64le-python-ccache
   ppc64le-cpp-ccache:
     name: ppc64le-cpp-ccache
+  ppc64le_wheel_output:
+    name: ppc64le_wheel_output
 
 services:
 
