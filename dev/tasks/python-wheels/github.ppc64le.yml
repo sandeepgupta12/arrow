@@ -52,9 +52,7 @@ jobs:
         run: |
           docker volume create ppc64le_wheel_output
           CONTAINER_NAME=ppc64le-wheel
-          ~/.local/bin/archery docker run --no-cache -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} \
-           --docker-args="-d --name $CONTAINER_NAME" \
-           ppc64le-python-wheel
+          ~/.local/bin/archery docker run --no-cache -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} ppc64le-python-wheel
 
           # Wait for container to finish
           echo "Waiting for container to finish..."
