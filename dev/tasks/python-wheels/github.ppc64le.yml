@@ -54,7 +54,8 @@ jobs:
           ~/.local/bin/archery docker run --no-cache -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} \
            --docker-args="-d --name $CONTAINER_NAME" \
            ppc64le-python-wheel
-           # Wait for container to finish
+
+          # Wait for container to finish
           echo "Waiting for container to finish..."
           while [ "$(docker inspect -f '{{.State.Running}}' $CONTAINER_NAME)" == "true" ]; do
             sleep 10
