@@ -50,6 +50,7 @@ jobs:
       - name: Build wheel
         shell: bash
         run: |
+          docker volume create ppc64le_wheel_output
           CONTAINER_NAME=ppc64le-wheel
           ~/.local/bin/archery docker run --no-cache -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} \
            --docker-args="-d --name $CONTAINER_NAME" \
@@ -63,15 +64,12 @@ jobs:
 
       - name: Copy built wheel to host
         run: |
-          CONTAINER_ID=$(docker ps -aq --filter "name=ppc64le-python-wheel")
-          if [ -z "$CONTAINER_ID" ]; then
-            echo "Error: No container found with name ppc64le-python-wheel"
-            exit 1
-          fi
-          docker cp $CONTAINER_ID:/arrow/python/repaired_wheels ./output || exit 1
-          sleep 5  # Allow Docker to complete its cleanup
-          docker stop $CONTAINER_ID || true
-          docker rm $CONTAINER_ID || true
+
+          mkdir -p ./output
+          docker run --rm \
+            -v ppc64le_wheel_output:/data \
+            -v "$(pwd)/output:/host" \
+            alpine sh -c "cp /data/*.whl /host/"
 
       - uses: actions/upload-artifact@v4
         with:
