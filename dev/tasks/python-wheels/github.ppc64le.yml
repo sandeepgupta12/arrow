@@ -57,7 +57,7 @@ jobs:
 
           # Wait for container to finish
           echo "Waiting for container to finish..."
-          while [ "$(docker inspect -f '{{.State.Running}}' $CONTAINER_NAME)" == "true" ]; do
+          while [ "$(docker inspect -f '{% raw %}{{.State.Running}}{% endraw %}' $CONTAINER_NAME)" == "true" ]; do
             sleep 10
           done
 
