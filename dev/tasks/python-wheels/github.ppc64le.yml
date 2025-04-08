@@ -52,13 +52,7 @@ jobs:
         run: |
           docker volume create ppc64le_wheel_output
           CONTAINER_NAME=ppc64le-wheel
-          ~/.local/bin/archery docker run --no-cache -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} ppc64le-python-wheel
-
-          # Wait for container to finish
-          echo "Waiting for container to finish..."
-          while [ "$(docker inspect -f '{% raw %}{{.State.Running}}{% endraw %}' $CONTAINER_NAME)" == "true" ]; do
-            sleep 10
-          done
+          ~/.local/bin/archery docker run -e SETUPTOOLS_SCM_PRETEND_VERSION={{ arrow.no_rc_version }} ppc64le-python-wheel
 
       - name: Copy built wheel to host
         run: |

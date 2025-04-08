@@ -1203,12 +1203,16 @@ services:
         - ppc64le/python:3.9-slim-bullseye
    
     volumes:
-      - ppc64le_wheel_output:/arrow/python/repaired_wheels
+      - ppc64le_wheel_output:/build
     environment:
       <<: [*common, *ccache]
     command: &ppc-python-command >
       /bin/bash -c "
-        git clone --recursive --depth=1 https://github.com/sandeepgupta12/arrow /arrow &&
+        if [ -z \"\$(ls -A /arrow 2>/dev/null)\" ]; then
+          git clone --recursive --depth=1 https://github.com/sandeepgupta12/arrow /arrow;
+        else
+          echo '/arrow is not empty, skipping clone';
+        fi
         /arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"  
 
   ppc64le-python-wheel-test-imports:
