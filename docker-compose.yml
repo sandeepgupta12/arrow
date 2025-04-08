@@ -1203,7 +1203,7 @@ services:
         - ppc64le/python:3.9-slim-bullseye
    
     volumes:
-      - ppc64le_wheel_output:/arrow/python/repaired_wheels
+      - ppc64le_wheel_output:/build
     environment:
       <<: [*common, *ccache]
     command: &ppc-python-command >
