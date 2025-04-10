@@ -68,10 +68,10 @@ RUN apt-get update -y -q && \
 
 RUN pip install Cython==3.0.8 numpy
 
-COPY python/requirements-build.txt /arrow-1/python/
+COPY arrow/python/requirements-build.txt /arrow-1/python/
 
 
-COPY python/requirements-test.txt /arrow-1/python/
+COPY arrow/python/requirements-test.txt /arrow-1/python/
 
 
 RUN pip install ninja
