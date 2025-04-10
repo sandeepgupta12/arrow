@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-ARG base=ppc64le/python:3.9-slim-bullseye
+ARG base=docker.io/ppc64le/python:3.9-slim-bullseye
 FROM ${base}
 
 ARG python=3.9
