@@ -31,16 +31,10 @@ RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout="10" && \
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && \
     update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
-# Install Docker
-RUN apt-get update && \
-    apt-get install -y apt-transport-https ca-certificates curl software-properties-common && \
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    add-apt-repository "deb [arch=ppc64el] https://download.docker.com/linux/ubuntu jammy stable" && \
-    apt-get update && \
-    apt-get install -y docker-ce docker-ce-cli containerd.io && \
+
+# Install Podman and podman-docker (Docker compatibility)
+RUN apt-get update && apt-get install -y podman podman-docker && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-
-
 
 # Install dotnet SDK and other dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -60,7 +54,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN useradd -c "Action Runner" -m runner && \
     usermod -L runner && \
     echo "runner ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/runner && \
-    usermod -aG docker runner
+    groupadd podman || true && \
+    usermod -aG podman runner
+
+# Configure Podman cgroup manager
+RUN mkdir -p /etc/containers && \
+    echo "[engine]\ncgroup_manager = \"cgroupfs\"" | sudo tee /etc/containers/containers.conf
 
 # Add and configure GitHub Actions runner
 ARG RUNNERREPO="https://github.com/actions/runner"
@@ -85,11 +84,11 @@ RUN mkdir -p /opt/runner && \
     chown -R  runner:runner /opt/runner && \
     su - runner -c "/opt/runner/config.sh --version"
 
-RUN     rm -rf /tmp/runner /tmp/runner.patch
+RUN rm -rf /tmp/runner /tmp/runner.patch
 
 # Copy custom scripts and set permissions
 COPY fs/ /
-RUN chmod 777 /usr/bin/actions-runner /usr/bin/entrypoint
+RUN chmod +x /usr/bin/actions-runner /usr/bin/entrypoint
 
 # Switch to the runner user
 USER runner
@@ -97,6 +96,9 @@ USER runner
 # Set working directory
 WORKDIR /opt/runner
 
+COPY --chown=runner:runner manywheel-ppc64le.tar /opt/runner/manywheel-ppc64le.tar
+
 # Define entry point and command
 ENTRYPOINT ["/usr/bin/entrypoint"]
 CMD ["/usr/bin/actions-runner"]
+
