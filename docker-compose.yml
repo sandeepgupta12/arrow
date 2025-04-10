@@ -1229,7 +1229,14 @@ services:
       <<: *common
       CHECK_IMPORTS: "ON"
       CHECK_UNITTESTS: "OFF"
-    command: /arrow/ci/scripts/ppc64le_python_wheel_unix_test.sh /arrow
+    command: &ppc-python-command2 >
+      /bin/bash -c "
+        if [ -z \"\$(ls -A /arrow 2>/dev/null)\" ]; then
+          git clone --recursive --depth=1 https://github.com/sandeepgupta12/arrow /arrow;
+        else
+          echo '/arrow is not empty, skipping clone';
+        fi
+        /arrow/ci/scripts/ppc64le_python_wheel_unix_test.sh /arrow"
 
   ############################ Python wheels ##################################
 
