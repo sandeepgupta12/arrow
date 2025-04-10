@@ -40,7 +40,7 @@ jobs:
 
       - name: Build Docker image for PPC64LE
         run: |
-          docker build -t ppc64le-python-wheel -f ci/docker/ppc64le-python.dockerfile .
+          docker build -t ppc64le-python-wheel -f arrow/ci/docker/ppc64le-python.dockerfile .
 
       - name: Build wheel
         shell: bash
