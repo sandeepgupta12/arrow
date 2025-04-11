@@ -196,4 +196,5 @@ rm -rf dist/temp-fix-wheel
 # Move the verified wheels
 mkdir -p ${source_dir}/python/repaired_wheels
 mv ${source_dir}/python/dist/*.whl ${source_dir}/python/repaired_wheels
+ls -d ${source_dir}/python/repaired_wheels
 popd
