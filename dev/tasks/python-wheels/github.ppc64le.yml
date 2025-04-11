@@ -61,13 +61,12 @@ jobs:
         run: |
           echo "Current working dir: $PWD"
           ls -lh arrow/python/repaired_wheels
-          ls -lh /arrow/python/repaired_wheels
-          ls -lh $(pwd)/arrow/python/repaired_wheels
+          
 
       - uses: actions/upload-artifact@v4
         with:
           name: wheel
-          path: $(pwd)/arrow/python/repaired_wheels/*.whl
+          path: arrow/python/repaired_wheels/*.whl
       
       - name: Test wheel
         shell: bash
