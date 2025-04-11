@@ -49,11 +49,11 @@ jobs:
           echo "Contents:"
           ls -al
       - name: Build wheel
-
+      
         shell: bash
         run: |
           docker run --rm \
-            -v /opt/runner/_work/crossbow/crossbow/arrow:/arrow \
+            -v "$(pwd)/arrow":/arrow \
             ppc64le-python-wheel \
             /bin/bash -c "arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
 
