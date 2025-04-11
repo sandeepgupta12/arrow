@@ -471,7 +471,7 @@ tasks:
       python_version: "3.9"
       wheel_platform_tag: "linux_ppc64le"
     artifacts:
-      - pyarrow-{no_rc_version}-cp39-cp39-linux_ppc64le.whl
+      - pyarrow-18.0.0.dev92-cp39-cp39-linux_ppc64le.whl
 
 {############################ Python sdist ####################################}
 
