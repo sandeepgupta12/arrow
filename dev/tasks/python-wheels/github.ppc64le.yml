@@ -60,8 +60,9 @@ jobs:
           path: arrow/python/repaired_wheels/*.whl
       
       
-          
-      {{ macros.github_install_archery()|indent }}
+      - name: Setup Archery
+        run: pip install -e arrow/dev/archery[docker]
+      
       {{ macros.github_upload_releases("arrow/python/repaired_wheels/*.whl")|indent }}
       
 
