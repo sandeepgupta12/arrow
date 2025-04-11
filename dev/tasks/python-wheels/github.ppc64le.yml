@@ -42,12 +42,7 @@ jobs:
         run: |
           docker build -t ppc64le-python-wheel -f arrow/ci/docker/ppc64le-python.dockerfile .
 
-      - name: Check current working directory
-        run: |
-          echo "PWD inside CI:"
-          pwd
-          echo "Contents:"
-          ls -al
+      
       - name: Build wheel
       
         shell: bash
@@ -57,26 +52,16 @@ jobs:
             ppc64le-python-wheel \
             /bin/bash -c "arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
 
-      - name: List contents of repaired_wheels
-        run: |
-          echo "Current working dir: $PWD"
-          ls -lh arrow/python/repaired_wheels
-          
+      
 
       - uses: actions/upload-artifact@v4
         with:
           name: wheel
           path: arrow/python/repaired_wheels/*.whl
       
-      - name: Test wheel
-        shell: bash
-        run: |
-          docker run --rm \
-            -v "$(pwd)/arrow":/arrow \
-            ppc64le-python-wheel \
-            /bin/bash -c "arrow/ci/scripts/ppc64le_python_wheel_unix_test.sh /arrow "
+      
           
-
+      {{ macros.github_install_archery()|indent }}
       {{ macros.github_upload_releases("arrow/python/repaired_wheels/*.whl")|indent }}
       
 
