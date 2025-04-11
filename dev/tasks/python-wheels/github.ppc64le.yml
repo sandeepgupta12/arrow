@@ -57,6 +57,12 @@ jobs:
             ppc64le-python-wheel \
             /bin/bash -c "arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
 
+      - name: List contents of repaired_wheels
+        run: |
+          echo "Current working dir: $PWD"
+          ls -lh arrow/python/repaired_wheels
+          ls -lh /arrow/python/repaired_wheels
+          ls -lh $(pwd)/arrow/python/repaired_wheels
 
       - uses: actions/upload-artifact@v4
         with:
