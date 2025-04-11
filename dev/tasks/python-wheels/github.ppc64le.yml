@@ -71,7 +71,11 @@ jobs:
       - name: Test wheel
         shell: bash
         run: |
-          ~/.local/bin/archery docker run ppc64le-python-wheel-test-imports
+          docker run --rm \
+            -v "$(pwd)/arrow":/arrow \
+            ppc64le-python-wheel \
+            /bin/bash -c "arrow/ci/scripts/ppc64le_python_wheel_unix_test.sh /arrow "
+          
 
       {{ macros.github_upload_releases("arrow/python/repaired_wheels/*.whl")|indent }}
       
