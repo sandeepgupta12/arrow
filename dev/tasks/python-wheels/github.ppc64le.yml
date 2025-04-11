@@ -42,11 +42,18 @@ jobs:
         run: |
           docker build -t ppc64le-python-wheel -f arrow/ci/docker/ppc64le-python.dockerfile .
 
+      - name: Check current working directory
+        run: |
+          echo "PWD inside CI:"
+          pwd
+          echo "Contents:"
+          ls -al
       - name: Build wheel
+
         shell: bash
         run: |
           docker run --rm \
-            -v "$(pwd)":/arrow \
+            -v /opt/runner/_work/crossbow/crossbow/arrow:/arrow \
             ppc64le-python-wheel \
             /bin/bash -c "arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
 
