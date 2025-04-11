@@ -55,7 +55,7 @@ jobs:
           docker run --rm \
             -v "$(pwd)/arrow":/arrow \
             ppc64le-python-wheel \
-            /bin/bash -c "arrow/ci/scripts/ppc64le-python-wheel.sh arrow build"
+            /bin/bash -c "arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
 
 
       - uses: actions/upload-artifact@v4
