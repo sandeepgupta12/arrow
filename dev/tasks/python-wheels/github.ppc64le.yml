@@ -42,12 +42,18 @@ jobs:
         run: |
           docker build -t ppc64le-python-wheel -f arrow/ci/docker/ppc64le-python.dockerfile .
 
+      - name: Setup Archery
+        run: |
+          python3 -m pip install --upgrade pip setuptools
+          python3 -m pip install -e arrow/dev/archery[docker]
+          export PATH="$HOME/.local/bin:$PATH"
+          echo "export PATH=$HOME/.local/bin:$PATH" >> ~/.bashrc
       
       - name: Build wheel
       
         shell: bash
         run: |
-          docker run --rm \
+          ~/.local/bin/archery docker run --rm \
             -v "$(pwd)/arrow":/arrow \
             ppc64le-python-wheel \
             /bin/bash -c "arrow/ci/scripts/ppc64le-python-wheel.sh /arrow /build"
