@@ -53,6 +53,8 @@ jobs:
       
         shell: bash
         run: |
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+          export ARCHERY_USE_DOCKER_CLI=1
           ~/.local/bin/archery docker run --rm \
             -v "$(pwd)/arrow":/arrow \
             ppc64le-python-wheel \
