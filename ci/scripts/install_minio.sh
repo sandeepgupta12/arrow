@@ -31,7 +31,8 @@ declare -A archs
 archs=([x86_64]=amd64
        [arm64]=arm64
        [aarch64]=arm64
-       [s390x]=s390x)
+       [s390x]=s390x
+       [ppc64le]=ppc64le)
 
 arch=$(uname -m)
 if [ -z "${archs[$arch]}" ]; then
