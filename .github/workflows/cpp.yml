@@ -104,7 +104,7 @@ jobs:
             ubuntu: 22.04
           - arch: ppc64le
             clang-tools: 14
-            ctest-timeout: 900
+            #ctest-timeout: 900
             image: ubuntu-ppc64le-cpp
             llvm: 14
             runs-on: [self-hosted, linux, ppc64le]
@@ -119,7 +119,7 @@ jobs:
             ubuntu: 24.04
     env:
       ARCH: ${{ matrix.arch }}
-      ARROW_CTEST_TIMEOUT: ${{ matrix.ctest-timeout }}
+      #ARROW_CTEST_TIMEOUT: ${{ matrix.ctest-timeout }}
       ARROW_SIMD_LEVEL: ${{ matrix.simd-level }}
       CLANG_TOOLS: ${{ matrix.clang-tools }}
       LLVM: ${{ matrix.llvm }}
