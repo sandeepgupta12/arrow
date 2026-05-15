@@ -152,9 +152,11 @@ RUN if [ "${gcc}" = "" ]; then \
       update-alternatives --set c++ /usr/bin/g++; \
     fi
 
-ARG cmake=3.28.3
-COPY ci/scripts/install_cmake.sh /arrow/ci/scripts/
-RUN /arrow/ci/scripts/install_cmake.sh ${cmake} /usr/local/
+RUN apt-get update -y -q && \
+    apt-get install -y -q --no-install-recommends \
+        cmake && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists*
 
 COPY ci/scripts/install_minio.sh /arrow/ci/scripts/
 RUN /arrow/ci/scripts/install_minio.sh latest /usr/local
