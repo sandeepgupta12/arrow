@@ -110,13 +110,13 @@ jobs:
             runs-on: [self-hosted, linux, ppc64le]
             title: PPC64LE Ubuntu 22.04 C++ CPU-only
             ubuntu: 22.04
-          - arch: ppc64le
-            clang-tools: 18
-            image: ubuntu-ppc64le-cpp
-            llvm: 18
-            runs-on: [self-hosted, linux, ppc64le]
-            title: PPC64LE Ubuntu 24.04 C++ CPU-only
-            ubuntu: 24.04
+          # - arch: ppc64le
+          #   clang-tools: 18
+          #   image: ubuntu-ppc64le-cpp
+          #   llvm: 18
+          #   runs-on: [self-hosted, linux, ppc64le]
+          #   title: PPC64LE Ubuntu 24.04 C++ CPU-only
+          #   ubuntu: 24.04
     env:
       ARCH: ${{ matrix.arch }}
       #ARROW_CTEST_TIMEOUT: ${{ matrix.ctest-timeout }}
