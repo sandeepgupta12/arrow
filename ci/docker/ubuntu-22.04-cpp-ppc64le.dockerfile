@@ -152,11 +152,8 @@ RUN if [ "${gcc}" = "" ]; then \
       update-alternatives --set c++ /usr/bin/g++; \
     fi
 
-RUN apt-get update -y -q && \
-    apt-get install -y -q --no-install-recommends \
-        cmake && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists*
+ARG cmake=3.28.3
+RUN python3 -m pip install --no-cache-dir "cmake==${cmake}"
 
 COPY ci/scripts/install_minio.sh /arrow/ci/scripts/
 RUN /arrow/ci/scripts/install_minio.sh latest /usr/local
