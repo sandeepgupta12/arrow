@@ -22,6 +22,13 @@ set -e
 node_version="$(node --version)"
 echo "Node.js version = ${node_version}"
 
+case "$(uname -m)" in
+  ppc64le)
+    echo "Azurite is not installed on this architecture: $(uname -m)"
+    exit 0
+    ;;
+esac
+
 azurite_version=latest
 case "$(uname)" in
   Darwin)
