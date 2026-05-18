@@ -57,7 +57,7 @@ jobs:
 
   docker:
     name: ${{ matrix.title }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on || 'ubuntu-latest' }}
     if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     timeout-minutes: 60
     strategy:
@@ -99,7 +99,16 @@ jobs:
             image: conda-python-no-numpy
             title: AMD64 Conda Python 3.12 without NumPy
             python: "3.12"
+          - name: ubuntu-python-3.12-ppc64le
+            arch: ppc64le
+            cache: ubuntu-python-ppc64le-24.04
+            image: ubuntu-python
+            runs-on: [self-hosted, linux, ppc64le]
+            title: PPC64LE Ubuntu 24.04 Python 3.12 Source Build
+            python: "3.12"
+            ubuntu: 24.04
     env:
+      ARCH: ${{ matrix.arch || 'amd64' }}
       PYTHON: ${{ matrix.python || 3.10 }}
       UBUNTU: ${{ matrix.ubuntu || 22.04 }}
       PANDAS: ${{ matrix.pandas || 'latest' }}
@@ -118,9 +127,16 @@ jobs:
           key: ${{ matrix.cache }}-${{ hashFiles('cpp/**') }}
           restore-keys: ${{ matrix.cache }}-
       - name: Setup Python
+        if: ${{ matrix.runs-on == null }}
         uses: actions/setup-python@v6
         with:
           python-version: 3.12
+      - name: Setup Python on self-hosted runner
+        if: ${{ matrix.runs-on != null }}
+        run: |
+          sudo apt update
+          sudo apt install -y --no-install-recommends python3 python3-dev python3-pip
+          python3 -m pip install -U pip
       - name: Setup Archery
         run: pip install -e dev/archery[docker]
       - name: Execute Docker Build
