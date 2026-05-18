@@ -1156,6 +1156,34 @@ services:
     volumes: *fedora-volumes
     command: *python-command
 
+  ubuntu-ppc64le-python:
+    # Usage:
+    #   docker compose build ubuntu-ppc64le-cpp
+    #   docker compose build ubuntu-ppc64le-python
+    #   docker compose run --rm ubuntu-ppc64le-python
+    # Parameters:
+    #   UBUNTU: 24.04
+    image: ${REPO}:ppc64le-ubuntu-${UBUNTU}-python-3
+    build:
+      context: .
+      dockerfile: ci/docker/ubuntu-${UBUNTU}-python-ppc64le.dockerfile
+      cache_from:
+        - ${REPO}:ppc64le-ubuntu-${UBUNTU}-python-3
+      args:
+        base: ${REPO}:ppc64le-ubuntu-${UBUNTU}-cpp
+        numba: ${NUMBA}
+        numba_cuda: ${NUMBA_CUDA}
+        cuda: ${CUDA}
+    shm_size: *shm-size
+    environment:
+      <<: [*common, *ccache]
+      ARROW_BUILD_UTILITIES: "OFF"
+      ARROW_ACERO: "ON"
+      ARROW_CUDA: "OFF"
+      SETUPTOOLS_SCM_PRETEND_VERSION:
+    volumes: *ubuntu-volumes
+    command: *python-command
+
   ############################ Python sdist ###################################
 
   python-sdist:

@@ -100,15 +100,13 @@ jobs:
             title: AMD64 Conda Python 3.12 without NumPy
             python: "3.12"
           - name: ubuntu-python-3.12-ppc64le
-            arch: ppc64le
-            cache: ubuntu-python-ppc64le-24.04
-            image: ubuntu-python
+            cache: ubuntu-ppc64le-python-24.04
+            image: ubuntu-ppc64le-python
             runs-on: [self-hosted, linux, ppc64le]
             title: PPC64LE Ubuntu 24.04 Python 3.12 Source Build
             python: "3.12"
             ubuntu: 24.04
     env:
-      ARCH: ${{ matrix.arch || 'amd64' }}
       PYTHON: ${{ matrix.python || 3.10 }}
       UBUNTU: ${{ matrix.ubuntu || 22.04 }}
       PANDAS: ${{ matrix.pandas || 'latest' }}
