@@ -149,7 +149,8 @@ x-hierarchy:
     - ubuntu-r
     - ubuntu-r-only-r
   - ppc64le-cpp
-  - ubuntu-ppc64le-cpp
+  - ubuntu-ppc64le-cpp:
+      - ubuntu-ppc64le-python
   - ubuntu-cpp-bundled
   - ubuntu-cpp-bundled-offline
   - ubuntu-cpp-odbc
