@@ -1172,9 +1172,9 @@ services:
         - ${REPO}:ppc64le-ubuntu-${UBUNTU}-python-3
       args:
         base: ${REPO}:ppc64le-ubuntu-${UBUNTU}-cpp
-        numba: ${NUMBA}
-        numba_cuda: ${NUMBA_CUDA}
-        cuda: ${CUDA}
+        numba:
+        numba_cuda:
+        cuda:
     shm_size: *shm-size
     environment:
       <<: [*common, *ccache]
