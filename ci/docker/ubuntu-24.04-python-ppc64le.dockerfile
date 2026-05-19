@@ -36,7 +36,9 @@ RUN python3 -m venv ${ARROW_PYTHON_VENV} && \
     pip install -U pip setuptools wheel && \
     pip install \
       -r arrow/python/requirements-build.txt \
-      -r arrow/python/requirements-test.txt
+      -r arrow/python/requirements-test.txt \
+      fsspec \
+      s3fs
 
 ARG numba
 ARG numba_cuda
